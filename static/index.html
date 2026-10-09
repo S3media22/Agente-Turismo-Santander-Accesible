@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guía Turística de Santander · Santy IA</title>
+  <style>
+    :root{
+      --base-scale:100%;
+      --green:#008751; --green-d:#005e38; --yellow:#FFC72C; --red:#E31C23; --red-d:#b00e14;
+      --bg-0:#0a1016; --bg-1:#0d1a1e; --panel:rgba(15,26,30,.66); --panel-2:rgba(255,255,255,.06);
+      --line:rgba(255,255,255,.12); --ink:#e9eff2; --muted:#9fb0b6;
+      --glass-blur:14px;
+    }
+    html{font-size:var(--base-scale)}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;font-family:"Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
+         color:var(--ink);line-height:1.5;overflow-x:hidden;
+         background:radial-gradient(1200px 700px at 15% -10%,rgba(0,135,81,.18),transparent 55%),
+                    radial-gradient(1100px 700px at 100% 110%,rgba(227,28,35,.16),transparent 55%),
+                    linear-gradient(160deg,var(--bg-0),var(--bg-1));
+         display:flex;flex-direction:column}
+    ::selection{background:var(--red);color:#fff}
+    ::-webkit-scrollbar{width:8px}
+    ::-webkit-scrollbar-track{background:rgba(0,0,0,.2)}
+    ::-webkit-scrollbar-thumb{background:linear-gradient(var(--green),var(--red));border-radius:8px}
+    *:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+
+    /* Silueta de montañas al fondo */
+    .mtns{position:fixed;left:0;right:0;bottom:0;width:100%;height:34vh;z-index:0;opacity:.5;pointer-events:none}
+    .orb{position:fixed;width:24rem;height:24rem;border-radius:50%;filter:blur(70px);z-index:0;pointer-events:none;
+         animation:breathe 7s ease-in-out infinite}
+    .orb.g{top:2rem;left:1rem;background:rgba(0,135,81,.20)}
+    .orb.r{bottom:2rem;right:1rem;background:rgba(227,28,35,.18);animation-delay:1.5s}
+    @keyframes breathe{0%,100%{opacity:.55}50%{opacity:.9}}
+
+    .glass{background:var(--panel);backdrop-filter:blur(var(--glass-blur));
+           -webkit-backdrop-filter:blur(var(--glass-blur));border:1px solid var(--line)}
+    .card{background:var(--panel-2);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:16px}
+    .tricolor{background:linear-gradient(90deg,var(--green) 0 33%,var(--yellow) 33% 66%,var(--red) 66% 100%)}
+
+    header{position:relative;z-index:20}
+    .hbar{height:6px}
+    .hrow{max-width:1180px;margin:0 auto;padding:12px 18px;display:flex;flex-wrap:wrap;gap:14px;
+          align-items:center;justify-content:space-between}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--green),var(--yellow),var(--red));
+          padding:2px}
+    .logo>span{display:grid;place-items:center;width:100%;height:100%;background:var(--bg-0);border-radius:12px;font-size:1.35rem}
+    .brand h1{margin:0;font-size:1.12rem;font-weight:800;letter-spacing:.2px;display:flex;align-items:center;gap:8px}
+    .pill{font-size:.6rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:20px;
+          background:linear-gradient(90deg,var(--green),var(--red));color:#fff}
+    .brand p{margin:2px 0 0;font-size:.76rem;color:var(--muted)}
+
+    .toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+    .a11y{display:flex;align-items:center;gap:2px;border-radius:12px;padding:3px}
+    .a11y button{background:transparent;border:none;color:var(--ink);font-weight:800;padding:6px 9px;border-radius:9px;cursor:pointer;font:inherit}
+    .a11y button:hover{background:rgba(255,255,255,.1)}
+    .tbtn{display:inline-flex;align-items:center;gap:7px;border-radius:12px;padding:7px 12px;cursor:pointer;
+          color:var(--ink);font-weight:600;font-size:.8rem;background:var(--panel-2);border:1px solid var(--line);font-family:inherit}
+    .tbtn:hover{background:rgba(255,255,255,.14)}
+    .tbtn[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+
+    main{position:relative;z-index:10;flex:1;max-width:1180px;width:100%;margin:0 auto;padding:18px;
+         display:flex;gap:18px;align-items:stretch}
+    aside{width:310px;flex-shrink:0;display:flex;flex-direction:column;gap:14px}
+    .box{border-radius:18px;padding:16px;box-shadow:0 12px 34px rgba(0,0,0,.3)}
+    .dept-top{display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid var(--line)}
+    .dots span{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:3px}
+    .tag{font-size:.62rem;font-weight:800;padding:3px 9px;border-radius:20px;border:1px solid var(--green);
+         color:#7ee0b4;background:rgba(0,135,81,.16)}
+    aside h2{margin:12px 0 4px;font-size:1.3rem;font-weight:800}
+    aside .desc{font-size:.78rem;color:var(--muted);margin:0}
+    .destinos{margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:9px}
+    .destino{text-align:left;padding:10px;border-radius:12px;cursor:pointer;background:var(--panel-2);
+             border:1px solid var(--line);color:var(--ink);font:inherit;transition:transform .12s,border-color .12s}
+    .destino:hover{transform:translateY(-2px);border-color:var(--yellow)}
+    .destino b{font-size:.78rem;display:flex;align-items:center;gap:6px}
+    .destino small{font-size:.66rem;color:var(--muted);display:block;margin-top:2px}
+    .about{font-size:.74rem;color:var(--muted);line-height:1.6}
+    .about b{color:var(--ink)}
+
+    /* Chat */
+    .chatwrap{flex:1;display:flex;flex-direction:column;border-radius:18px;overflow:hidden;
+              box-shadow:0 14px 40px rgba(0,0,0,.34)}
+    .chead{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 16px;
+           border-bottom:1px solid var(--line);background:rgba(10,16,22,.7)}
+    .chead .who{display:flex;align-items:center;gap:11px}
+    .avatar{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,var(--green),var(--yellow),var(--red));
+            display:grid;place-items:center;font-weight:900;font-size:1.15rem;color:#fff}
+    .chead h3{margin:0;font-size:.98rem;font-weight:800;display:flex;align-items:center;gap:8px}
+    .on{font-size:.6rem;font-weight:700;color:#7ee0b4;background:rgba(0,135,81,.2);border:1px solid rgba(0,135,81,.4);
+        padding:2px 7px;border-radius:6px}
+    .chead p{margin:1px 0 0;font-size:.72rem;color:var(--muted)}
+    .cactions{display:flex;gap:8px}
+    .iconbtn{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;cursor:pointer;font-size:1rem;
+             background:var(--panel-2);border:1px solid var(--line);color:var(--ink)}
+    .iconbtn:hover{background:rgba(255,255,255,.14)}
+
+    /* Selector de fase */
+    .fases{display:flex;flex-wrap:wrap;gap:6px;padding:10px 16px;border-bottom:1px solid var(--line);background:rgba(10,16,22,.4)}
+    .fase{flex:1 1 145px;min-width:145px;display:flex;align-items:center;justify-content:center;gap:9px;padding:9px;border-radius:11px;cursor:pointer;
+          background:var(--panel-2);border:1px solid var(--line);color:var(--muted);font:inherit;transition:all .15s}
+    .fase b{font-size:.82rem;color:var(--ink)}
+    .fase small{font-size:.66rem;display:block;color:var(--muted)}
+    .fase.on{border-color:transparent;background:linear-gradient(135deg,var(--green-d),var(--green))}
+    .fase.on.rag{background:linear-gradient(135deg,var(--red-d),var(--red))}
+    .fase.on.web{background:linear-gradient(135deg,#e6b800,var(--yellow))}
+    .fase.on.grafo{background:linear-gradient(135deg,#5b46b0,#7c66d6)}
+    .fase.on.itin{background:linear-gradient(135deg,#0a7d6c,#12b39a)}
+    .fase.on b,.fase.on small{color:#fff}
+    .fase.on.web b,.fase.on.web small{color:#241a00}
+
+    #msgs{flex:1;padding:18px 16px;overflow-y:auto;display:flex;flex-direction:column;gap:14px;min-height:300px;max-height:52vh}
+    .m{display:flex;gap:10px;align-items:flex-start}
+    .m.user{flex-direction:row-reverse}
+    .m .av{width:34px;height:34px;border-radius:11px;flex-shrink:0;display:grid;place-items:center;font-size:.95rem;color:#fff}
+    .m.bot .av{background:linear-gradient(135deg,var(--green),var(--red))}
+    .m.user .av{background:#28323a;border:1px solid var(--line)}
+    .m .bub{max-width:78%;padding:12px 14px;border-radius:15px;font-size:.92rem}
+    .m.bot .bub{background:var(--panel-2);border:1px solid var(--line);border-top-left-radius:5px}
+    .m.user .bub{background:linear-gradient(135deg,var(--red),var(--red-d));color:#fff;border-top-right-radius:5px}
+    .m .name{font-size:.62rem;color:var(--muted);margin-top:5px}
+    .badge{display:inline-flex;align-items:center;gap:5px;font-size:.6rem;font-weight:800;letter-spacing:.05em;
+           text-transform:uppercase;padding:3px 9px;border-radius:20px;margin-bottom:7px}
+    .badge.ctx{background:rgba(0,135,81,.2);color:#7ee0b4}
+    .badge.rag{background:rgba(227,28,35,.2);color:#ff9ba0}
+    .badge.web{background:rgba(255,199,44,.2);color:var(--yellow)}
+    .badge.itin{background:rgba(0,180,160,.2);color:#7fe9d8}
+    .badge.grafo{background:rgba(150,120,255,.2);color:#c9b8ff}
+    .badge .ruta{font-weight:600;opacity:.85;letter-spacing:0}
+    .wsec{font-weight:800;margin:11px 0 4px;color:var(--ink)}
+    .wline{margin:3px 0}
+    .wli{margin:2px 0;padding-left:16px;position:relative}
+    .wli::before{content:"•";position:absolute;left:3px;color:var(--green)}
+    .wline a,.wli a{color:var(--yellow);word-break:break-all}
+    body.hc .wli::before{color:#000}
+    .dlpdf{display:inline-flex;align-items:center;gap:7px;margin-top:12px;padding:9px 13px;border-radius:11px;
+      font-weight:700;font-size:.8rem;text-decoration:none;color:#fff;
+      background:linear-gradient(135deg,var(--green-d),var(--green));border:1px solid var(--line);
+      transition:transform .12s,filter .12s}
+    .dlpdf:hover{transform:translateY(-1px);filter:brightness(1.08)}
+    body.hc .dlpdf{background:#fff !important;color:#000 !important;border:1px solid #fff !important}
+    .src{font-size:.7rem;color:var(--muted);margin-top:8px}
+    details.citas{margin-top:9px}
+    details.citas summary{cursor:pointer;color:var(--yellow);font-weight:700;font-size:.74rem;list-style:none}
+    details.citas summary::-webkit-details-marker{display:none}
+    details.citas summary::before{content:"▸ "}
+    details.citas[open] summary::before{content:"▾ "}
+    .cita{border-left:3px solid var(--yellow);padding:6px 10px;margin:7px 0;background:rgba(255,255,255,.04);
+          border-radius:0 8px 8px 0;font-size:.74rem;color:var(--ink)}
+    .cita .cmeta{font-size:.64rem;color:var(--muted);margin-top:3px;font-weight:600}
+    /* Acordeón "Proceso" (qué hizo el agente antes de responder) */
+    details.proceso{margin:2px 0 8px}
+    details.proceso summary{cursor:pointer;color:var(--muted);font-weight:700;font-size:.72rem;list-style:none}
+    details.proceso summary::-webkit-details-marker{display:none}
+    details.proceso summary::before{content:"▸ "}
+    details.proceso[open] summary::before{content:"▾ "}
+    .pchunk{border-left:3px solid var(--muted);padding:5px 9px;margin:5px 0;background:rgba(255,255,255,.03);border-radius:6px;font-size:.72rem;color:var(--ink)}
+    .pchunk .pmeta{font-size:.62rem;color:var(--muted);margin-top:2px;font-weight:600}
+    .procline{color:var(--muted);font-size:.72rem;margin:2px 0 8px}
+    .wloading{color:var(--muted);font-size:.85rem}
+    body.hc .wloading{color:#000 !important}
+    body.hc details.proceso summary,body.hc .procline,body.hc .pchunk .pmeta{color:#000 !important}
+    body.hc .pchunk{border-left-color:#000 !important;color:#000 !important;background:#fff !important}
+    .dots{display:inline-flex;gap:5px}
+    .dots i{width:7px;height:7px;border-radius:50%;background:var(--yellow);animation:bl 1.1s infinite}
+    .dots i:nth-child(2){background:var(--green);animation-delay:.15s}
+    .dots i:nth-child(3){background:var(--red);animation-delay:.3s}
+    @keyframes bl{0%,80%,100%{opacity:.3;transform:translateY(0)}40%{opacity:1;transform:translateY(-4px)}}
+
+    .quick{display:flex;gap:8px;padding:10px 16px;overflow-x:auto;border-top:1px solid var(--line);background:rgba(10,16,22,.4)}
+    .quick .lbl{font-size:.66rem;font-weight:800;color:var(--yellow);white-space:nowrap;align-self:center}
+    .qchip{white-space:nowrap;padding:6px 12px;border-radius:20px;cursor:pointer;font-size:.74rem;
+           background:var(--panel-2);border:1px solid var(--line);color:var(--ink);font:inherit}
+    .qchip:hover{border-color:var(--red)}
+
+    .composer{padding:13px 16px;border-top:1px solid var(--line);background:rgba(10,16,22,.75)}
+    .crow{display:flex;gap:9px;align-items:center}
+    #input{flex:1;padding:13px 15px;border-radius:13px;font-size:.95rem;background:rgba(10,16,22,.8);
+           border:1px solid var(--line);color:var(--ink);outline:none}
+    #input::placeholder{color:var(--muted)}
+    #input:focus{border-color:var(--yellow)}
+    .send{padding:0 20px;height:47px;border-radius:13px;border:none;cursor:pointer;font-weight:800;font-size:.9rem;
+          color:#fff;background:linear-gradient(135deg,var(--red),var(--red-d));font-family:inherit;display:inline-flex;align-items:center;gap:8px}
+    .send:hover{filter:brightness(1.08)}
+    .send:disabled{opacity:.5;cursor:not-allowed}
+    .mic{width:47px;height:47px;border-radius:13px;border:1px solid var(--line);background:var(--panel-2);color:var(--yellow);
+         cursor:pointer;font-size:1.05rem}
+    .mic.rec{background:var(--red);color:#fff;animation:breathe 1s infinite}
+    .subacts{display:flex;gap:9px;margin-top:10px;flex-wrap:wrap}
+    .subact{display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:20px;cursor:pointer;
+            font-size:.76rem;color:var(--muted);background:none;border:1px solid var(--line);font:inherit}
+    .subact:hover{border-color:var(--green);color:#7ee0b4}
+    #voice{display:none;margin-top:10px;padding:9px 12px;border-radius:11px;font-size:.76rem;color:#ff9ba0;
+           background:rgba(227,28,35,.16);border:1px solid rgba(227,28,35,.4);align-items:center;gap:8px}
+    #voice.show{display:flex}
+
+    footer{position:relative;z-index:10;text-align:center;color:var(--muted);font-size:.72rem;padding:10px 16px 18px}
+
+    /* Alto contraste — TEMA CLARO: fondo blanco, texto negro, bordes definidos.
+       Es el patrón de alto contraste más común y legible (blanco/negro, no oscuro). */
+    body.hc{background:#fff !important;color:#000 !important}
+    /* Contenedores: fondo blanco, sin glass/blur/sombra; borde negro fino para separar. */
+    body.hc .glass,body.hc .card,body.hc .box,body.hc .chatwrap{
+      background:#fff !important;border:1px solid #000 !important;box-shadow:none !important;backdrop-filter:none !important}
+    /* Todo el texto a negro (elimina grises de bajo contraste). */
+    body.hc,body.hc .muted,body.hc .desc,body.hc small,body.hc p,body.hc .name,body.hc .about,body.hc b,body.hc h2,body.hc .lbl,body.hc footer,body.hc .brand h1{color:#000 !important}
+    /* Controles interactivos: fondo blanco, borde negro 2px, texto negro. */
+    body.hc #input,body.hc .fase,body.hc .qchip,body.hc .tbtn,body.hc .iconbtn,body.hc .subact,body.hc .mic,body.hc .destino{
+      background:#fff !important;border:2px solid #000 !important;color:#000 !important;box-shadow:none !important;backdrop-filter:none !important}
+    body.hc #input::placeholder{color:#444 !important}
+    body.hc .bub{background:#fff !important;border:1px solid #000 !important;color:#000 !important}
+    body.hc .badge{background:#fff !important;color:#000 !important;border:1px solid #000 !important}
+    /* Enlaces: azul clásico + subrayado (alto contraste sobre blanco). */
+    body.hc a,body.hc .wline a{color:#0000cc !important;text-decoration:underline !important}
+    body.hc .orb,body.hc .mtns{display:none}
+    /* Estado activo / acciones primarias: negro sólido con texto blanco (resaltan claramente). */
+    body.hc .send,body.hc .fase.on,body.hc .tbtn[aria-pressed="true"],body.hc .dlpdf{
+      background:#000 !important;border:2px solid #000 !important;color:#fff !important;font-weight:800}
+    body.hc .fase.on b,body.hc .fase.on small{color:#fff !important}
+    /* Foco muy visible en cualquier elemento. */
+    body.hc *:focus-visible{outline:3px solid #0000cc !important;outline-offset:2px}
+
+    /* Lectura fácil */
+    body.dys{letter-spacing:.06em;word-spacing:.16em;line-height:1.9}
+
+    @media (max-width:880px){
+      main{flex-direction:column}
+      aside{width:100%}
+      .destinos{grid-template-columns:1fr 1fr}
+    }
+    @media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+  </style>
+</head>
+<body>
+  <div class="orb g"></div><div class="orb r"></div>
+  <svg class="mtns" viewBox="0 0 1440 400" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0,400 L0,230 C220,150 360,270 560,210 C760,150 900,60 1120,150 C1260,205 1360,180 1440,200 L1440,400 Z" fill="#0c2a24"/>
+    <path d="M0,400 L0,290 C240,230 420,320 640,280 C880,235 1020,300 1220,270 C1330,254 1390,280 1440,272 L1440,400 Z" fill="#0a1f1c"/>
+  </svg>
+
+  <header>
+    <div class="hbar tricolor"></div>
+    <div class="hrow glass">
+      <div class="brand">
+        <div class="logo"><span>🏔️</span></div>
+        <div>
+          <h1>Guía de Santander <span class="pill">Turismo IA</span></h1>
+          <p>Asistente turístico del departamento de Santander, Colombia</p>
+        </div>
+      </div>
+      <div class="toolbar">
+        <div class="a11y card" title="Tamaño de letra">
+          <button onclick="fontSize(-10)" aria-label="Disminuir texto">A−</button>
+          <button onclick="fontSize(0)" aria-label="Restablecer texto">A</button>
+          <button onclick="fontSize(10)" aria-label="Aumentar texto">A+</button>
+        </div>
+        <button id="b-hc" class="tbtn" aria-pressed="false" onclick="toggleHC()" title="Alto contraste">🌓 <span>Contraste</span></button>
+        <button id="b-tts" class="tbtn" aria-pressed="false" onclick="toggleTTS()" title="Leer respuestas en voz alta">🔊 <span>Voz</span></button>
+        <button id="b-dys" class="tbtn" aria-pressed="false" onclick="toggleDys()" title="Lectura fácil (espaciado)">🔤 <span>Lectura fácil</span></button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <aside>
+      <div class="box glass">
+        <div class="dept-top">
+          <span class="dots"><span style="background:var(--green)"></span><span style="background:var(--yellow)"></span><span style="background:var(--red)"></span></span>
+          <span class="tag">87 municipios</span>
+        </div>
+        <h2>Santander</h2>
+        <p class="desc">Tierra de libertad, cañones majestuosos, pueblos coloniales y deportes de aventura. Capital: <b style="color:var(--ink)">Bucaramanga</b>.</p>
+        <div class="destinos">
+          <button class="destino" onclick="quickAsk('¿Qué hacer en el Cañón del Chicamocha?')"><b>⛰️ Chicamocha</b><small>Parque y teleférico</small></button>
+          <button class="destino" onclick="quickAsk('¿Por qué Barichara es famosa?')"><b>🏛️ Barichara</b><small>Pueblo patrimonio</small></button>
+          <button class="destino" onclick="quickAsk('¿Qué comida típica debo probar en Santander?')"><b>🐜 Gastronomía</b><small>Mute, hormigas, obleas</small></button>
+          <button class="destino" onclick="quickAsk('¿Dónde puedo practicar rafting en San Gil?')"><b>🚣 San Gil</b><small>Rafting y aventura</small></button>
+        </div>
+      </div>
+      <div class="box glass">
+        <div style="font-size:.66rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--yellow);margin-bottom:8px">Sobre este asistente</div>
+        <p class="about">Guía turística con <b>IA</b> del <b>Challenge Alura Agente</b>. Responde desde una <b>guía en PDF</b> usando <b>LangChain</b> (Gemini/Groq/Cohere). Elige la fase <b>Contexto completo</b>, <b>Guía + Web</b> (info actual de internet) o <b>RAG</b> (con citas), identifica lugares <b>por foto</b> y es <b>accesible</b> (voz, contraste, lectura fácil).</p>
+        <a class="dlpdf" href="/guia.pdf" download="guia_turistica_santander.pdf" title="Descargar la guía turística en PDF (documento fuente del agente)">📄 Descargar la guía (PDF)</a>
+      </div>
+    </aside>
+
+    <section class="chatwrap glass">
+      <div class="chead">
+        <div class="who">
+          <div class="avatar">S</div>
+          <div>
+            <h3>Santy · Guía IA <span class="on">En línea</span></h3>
+            <p>Turismo, cultura y gastronomía de Santander</p>
+          </div>
+        </div>
+        <div class="cactions">
+          <button class="iconbtn" onclick="speakLast()" title="Escuchar última respuesta" aria-label="Escuchar">🔈</button>
+          <button class="iconbtn" onclick="clearChat()" title="Reiniciar conversación" aria-label="Reiniciar">↻</button>
+        </div>
+      </div>
+
+      <div class="fases" id="modos" role="tablist" aria-label="Fase de respuesta">
+        <button class="fase on" data-modo="ask" role="tab" aria-selected="true">🧭 <span><b>Contexto completo</b><small>respuesta directa</small></span></button>
+        <button class="fase rag" data-modo="rag" role="tab" aria-selected="false">🔎 <span><b>RAG · base vectorial</b><small>con citas de fuente</small></span></button>
+        <button class="fase web" data-modo="web" role="tab" aria-selected="false">🌐 <span><b>Guía + Web</b><small>info actual con fuentes</small></span></button>
+        <button class="fase grafo" data-modo="grafo" role="tab" aria-selected="false">🕸️ <span><b>Grafo · triaje</b><small>clasifica y enruta</small></span></button>
+        <button class="fase itin" data-modo="itin" role="tab" aria-selected="false">🧳 <span><b>Itinerario</b><small>plan de viaje</small></span></button>
+      </div>
+
+      <div id="msgs" role="log" aria-live="polite" aria-label="Conversación con Santy">
+        <div class="m bot">
+          <div class="av">S</div>
+          <div>
+            <div class="bub">¡Hola! 👋 Soy <b>Santy</b>, tu guía del departamento de <b>Santander</b>. Pregúntame por el Cañón del Chicamocha, la belleza colonial de Barichara, la aventura de San Gil o qué platos típicos probar. Puedes escribir o <b>hablarme por el micrófono</b> 🎙️.</div>
+            <div class="name">Santy · Guía IA</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="quick">
+        <span class="lbl">⚡ Consultas:</span>
+        <button class="qchip" onclick="quickAsk('¿Cuál es la capital de Santander?')">🏙️ Capital</button>
+        <button class="qchip" onclick="quickAsk('¿Qué eventos y ferias hay en Bucaramanga?')">🎉 Eventos</button>
+        <button class="qchip" onclick="quickAsk('¿Cuál es la mejor época para visitar Santander?')">📅 Mejor época</button>
+        <button class="qchip" onclick="quickAsk('¿Cómo llego de Bucaramanga a San Gil?')">🛣️ Cómo llegar</button>
+      </div>
+
+      <div class="composer">
+        <div class="crow">
+          <button class="mic" id="mic" onclick="toggleVoice()" title="Hablar por micrófono" aria-label="Dictar por voz">🎙️</button>
+          <input id="input" placeholder="Escribe tu consulta (ej. ¿qué hacer en San Gil?)…" autocomplete="off" aria-label="Escribe tu pregunta" />
+          <button class="send" id="send" onclick="enviar()" aria-label="Enviar">Enviar ➤</button>
+        </div>
+        <div class="subacts">
+          <button class="subact" onclick="document.getElementById('img').click()">📷 Identificar por foto</button>
+          <input type="file" id="img" accept="image/*" style="display:none" />
+          <button class="subact" onclick="adminAnalisis()">🔐 Análisis de conversaciones</button>
+        </div>
+        <div id="voice"><span style="width:9px;height:9px;border-radius:50%;background:var(--red);display:inline-block;animation:breathe .8s infinite"></span> Escuchando… habla ahora.</div>
+      </div>
+    </section>
+  </main>
+
+  <footer>Agente IA · LangChain + FastAPI · Challenge Alura Agente · Fuente: guía turística de Santander (PDF)</footer>
+
+  <script>
+    const msgs=document.getElementById('input')?document.getElementById('msgs'):null;
+    const box=document.getElementById('msgs');
+    const input=document.getElementById('input');
+    const send=document.getElementById('send');
+    let modo='ask', ttsOn=false, listening=false, recog=null, lastReply='';
+
+    /* Sesión persistente */
+    function sid(){let id=localStorage.getItem('agente_session');
+      if(!id){id='sess-'+(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2));
+        localStorage.setItem('agente_session',id);}return id;}
+    const SESSION_ID=sid();
+
+    /* Selector de fase — al cambiar, se limpia el chat para no mezclar contextos */
+    document.getElementById('modos').addEventListener('click',e=>{
+      const b=e.target.closest('.fase'); if(!b||b.dataset.modo===modo) return;
+      modo=b.dataset.modo;
+      document.querySelectorAll('.fase').forEach(x=>{const on=x===b;x.classList.toggle('on',on);x.setAttribute('aria-selected',on);});
+      box.innerHTML='';
+      introFase(modo);
+      input.focus();
+    });
+
+    /* Construcción de mensajes */
+    function fila(clase){const m=document.createElement('div');m.className='m '+clase;
+      const av=document.createElement('div');av.className='av';av.textContent=clase==='user'?'🧑':'S';
+      const wrap=document.createElement('div');const bub=document.createElement('div');bub.className='bub';
+      wrap.appendChild(bub);m.appendChild(av);m.appendChild(wrap);box.appendChild(m);
+      box.scrollTop=box.scrollHeight;return {bub,wrap};}
+    function nombre(wrap,txt){const n=document.createElement('div');n.className='name';n.textContent=txt;wrap.appendChild(n);}
+
+    function msgUser(t){const{bub}=fila('user');bub.textContent=t;box.scrollTop=box.scrollHeight;}
+    function msgBot(t,fuente,fase){const{bub,wrap}=fila('bot');
+      if(fase){const b=document.createElement('span');b.className='badge '+(fase==='rag'?'rag':'ctx');
+        b.textContent=fase==='rag'?'🔎 RAG · base vectorial':'🧭 Contexto completo';bub.appendChild(b);bub.appendChild(document.createElement('br'));}
+      const s=document.createElement('span');s.textContent=t;bub.appendChild(s);
+      if(fuente){const f=document.createElement('div');f.className='src';f.textContent='📄 Fuente: '+fuente;bub.appendChild(f);}
+      nombre(wrap,'Santy · Guía IA');box.scrollTop=box.scrollHeight;}
+    /* Resumen de cada fase (qué hace + la técnica que implementa) al cambiar */
+    const FASE_INFO={
+      ask:{t:'🧭 Contexto completo',
+        d:'Inyecto la guía completa (PDF) como contexto y te respondo directo, en streaming (token a token). Ideal para preguntas generales de Santander.',
+        tec:'Técnica: prompt con el documento entero · LangChain + respuesta en streaming (SSE).'},
+      rag:{t:'🔎 RAG · base vectorial',
+        d:'Busco en la guía por SIGNIFICADO: la parto en fragmentos, los convierto en vectores y recupero solo los más relevantes; respondo con eso y cito las páginas exactas.',
+        tec:'Técnica: embeddings Cohere + base vectorial FAISS + citas trazables con filtro de relevancia.'},
+      web:{t:'🌐 Guía + Web',
+        d:'Combino la guía (lo estático) con información ACTUAL de internet: eventos, ferias, clima y precios de hoy, siempre citando las fuentes.',
+        tec:'Técnica: grafo LangGraph (router → guía / web / ambas → supervisor) + búsqueda web Tavily.'},
+      grafo:{t:'🕸️ Grafo · triaje',
+        d:'Clasifico tu consulta (triaje) y la enruto: resolver con la guía (RAG), pedir más info o abrir un "ticket". Escribe tu consulta y envía.',
+        tec:'Técnica: grafo de estados LangGraph (StateGraph) con salida estructurada (Literal) y aristas condicionales.'},
+      itin:{t:'🧳 Itinerario',
+        d:'Describe tu viaje (ej. "un fin de semana de aventura en San Gil") y te armo un itinerario por días. Tarda unos segundos (es multiagente).',
+        tec:'Técnica: multiagente LangGraph (plan → investigar web+guía → redactar → reflexionar), con loop de revisión.'}
+    };
+    function introFase(modo){const{bub,wrap}=fila('bot');
+      const info=FASE_INFO[modo]||FASE_INFO.ask;
+      const t=document.createElement('div');t.style.fontWeight='800';t.style.marginBottom='4px';
+      t.textContent='Fase '+info.t+' activa';bub.appendChild(t);
+      const d=document.createElement('div');d.textContent=info.d;bub.appendChild(d);
+      const tec=document.createElement('div');tec.style.fontSize='.72rem';tec.style.color='var(--muted)';
+      tec.style.marginTop='6px';tec.textContent=info.tec;bub.appendChild(tec);
+      nombre(wrap,'Santy · Guía IA');box.scrollTop=box.scrollHeight;}
+
+    function msgRag(d){const{bub,wrap}=fila('bot');
+      const b=document.createElement('span');b.className='badge rag';b.textContent='🔎 RAG · base vectorial';
+      bub.appendChild(b);bub.appendChild(document.createElement('br'));
+      const s=document.createElement('span');s.textContent=d.respuesta;bub.appendChild(s);
+      if(d.citaciones&&d.citaciones.length){const det=document.createElement('details');det.className='citas';
+        const sm=document.createElement('summary');sm.textContent=d.citaciones.length+' fuente(s) citada(s)';det.appendChild(sm);
+        d.citaciones.forEach(c=>{const cd=document.createElement('div');cd.className='cita';cd.textContent=c.contenido;
+          const mt=document.createElement('div');mt.className='cmeta';mt.textContent='📄 '+c.fuente+' · pág. '+c.pagina;
+          cd.appendChild(mt);det.appendChild(cd);});bub.appendChild(det);}
+      nombre(wrap,'Santy · Guía IA');box.scrollTop=box.scrollHeight;}
+    function cargando(){const{bub,wrap}=fila('bot');bub.innerHTML='<span class="dots"><i></i><i></i><i></i></span>';return wrap.parentNode;}
+    /* Loader con etiqueta (para acciones NO streaming que tardan unos segundos). */
+    function cargandoTxt(html,badge){const{bub,wrap}=fila('bot');
+      const b=badge||'<span class="badge web">🌐 Guía + Web</span>';
+      bub.innerHTML=b+'<br><span class="wloading">'+html+' <span class="dots"><i></i><i></i><i></i></span></span>';
+      return wrap.parentNode;}
+
+    /* Burbuja del bot para streaming: badge + span de texto vacío que se va llenando */
+    function iniciarBot(fase){const{bub,wrap}=fila('bot');
+      const b=document.createElement('span');b.className='badge '+(fase==='rag'?'rag':'ctx');
+      b.textContent=fase==='rag'?'🔎 RAG · base vectorial':'🧭 Contexto completo';
+      bub.appendChild(b);bub.appendChild(document.createElement('br'));
+      const s=document.createElement('span');bub.appendChild(s);
+      nombre(wrap,'Santy · Guía IA');return {bub,span:s};}
+    function agregarFuente(bub,fuente){if(!fuente)return;
+      const f=document.createElement('div');f.className='src';f.textContent='📄 Fuente: '+fuente;bub.appendChild(f);}
+    /* Acordeón "Proceso": qué hizo el agente (recuperación + fragmentos), expandible. */
+    function agregarProceso(bot,data){
+      const frags=data.fragmentos||[];
+      let el;
+      if(frags.length){
+        el=document.createElement('details');el.className='proceso';
+        const sm=document.createElement('summary');sm.textContent='🧠 Proceso — '+(data.resumen||'')+' (ver detalle)';el.appendChild(sm);
+        frags.forEach(f=>{const c=document.createElement('div');c.className='pchunk';c.textContent=f.preview;
+          const mt=document.createElement('div');mt.className='pmeta';mt.textContent='📄 '+f.fuente+' · pág. '+f.pagina;
+          c.appendChild(mt);el.appendChild(c);});
+      }else{
+        el=document.createElement('div');el.className='procline';el.textContent='🧠 '+(data.resumen||'');
+      }
+      bot.bub.insertBefore(el, bot.span);box.scrollTop=box.scrollHeight;}
+    function agregarCitas(bub,citaciones){if(!citaciones||!citaciones.length)return;
+      const det=document.createElement('details');det.className='citas';
+      const sm=document.createElement('summary');sm.textContent=citaciones.length+' fuente(s) citada(s)';det.appendChild(sm);
+      citaciones.forEach(c=>{const cd=document.createElement('div');cd.className='cita';cd.textContent=c.contenido;
+        const mt=document.createElement('div');mt.className='cmeta';mt.textContent='📄 '+c.fuente+' · pág. '+c.pagina;
+        cd.appendChild(mt);det.appendChild(cd);});bub.appendChild(det);}
+
+    /* Render seguro (markdown-lite) para el modo web: secciones ###, saltos y enlaces */
+    function renderRico(bub,texto){
+      const linkify=(linea,padre)=>{const re=/(https?:\/\/[^\s)]+)/g;let last=0,m;
+        while((m=re.exec(linea))){ if(m.index>last)padre.appendChild(document.createTextNode(linea.slice(last,m.index)));
+          const a=document.createElement('a');a.href=m[1];a.textContent=m[1];a.target='_blank';a.rel='noopener noreferrer';padre.appendChild(a);
+          last=m.index+m[1].length; }
+        if(last<linea.length)padre.appendChild(document.createTextNode(linea.slice(last)));};
+      // Inline: **negrita** (seguro, sin innerHTML) + enlaces clicables.
+      const inline=(txt,padre)=>{txt.split(/(\*\*[^*]+\*\*)/g).forEach(p=>{
+        if(/^\*\*[^*]+\*\*$/.test(p)){const b=document.createElement('strong');b.textContent=p.slice(2,-2);padre.appendChild(b);}
+        else if(p) linkify(p,padre);});};
+      (texto||'').split('\n').forEach(linea=>{const t=linea.trim();
+        if(!t){bub.appendChild(document.createElement('br'));return;}
+        if(/^#{1,4}\s/.test(t)){const h=document.createElement('div');h.className='wsec';inline(t.replace(/^#{1,4}\s/,''),h);bub.appendChild(h);return;}
+        const mb=t.match(/^[*+\-]\s+(.*)/);
+        if(mb){const li=document.createElement('div');li.className='wli';inline(mb[1],li);bub.appendChild(li);return;}
+        const p=document.createElement('div');p.className='wline';inline(t,p);bub.appendChild(p);});
+    }
+    function msgWeb(d){const{bub,wrap}=fila('bot');
+      const b=document.createElement('span');b.className='badge web';b.textContent='🌐 Guía + Web';
+      if(d.ruta){const r=document.createElement('span');r.className='ruta';r.textContent=' · '+d.ruta;b.appendChild(r);}
+      bub.appendChild(b);bub.appendChild(document.createElement('br'));
+      renderRico(bub,d.respuesta);
+      nombre(wrap,'Santy · Guía IA');box.scrollTop=box.scrollHeight;}
+
+    /* Modo web: consulta el grafo combinado (guía + Tavily). No es streaming. */
+    async function preguntarWeb(t){
+      const load=cargandoTxt('Consultando la guía e internet (Tavily) y redactando…');
+      try{
+        const r=await fetch('/grafo/combinado',{method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({pregunta:t,session_id:SESSION_ID})});
+        load.remove();
+        if(!r.ok){const d=await r.json().catch(()=>({}));msgBot('⚠️ '+(d.detail||'Error en el servidor.'));return;}
+        const d=await r.json(); msgWeb(d);
+        lastReply=d.respuesta||''; if(ttsOn) speak(lastReply);
+      }catch(e){if(load&&load.parentNode)load.remove();msgBot('⚠️ No se pudo conectar con el servidor.');}
+    }
+
+    /* Envío al agente real — STREAMING (SSE): la respuesta aparece token a token */
+    async function preguntar(t){
+      msgUser(t); input.value=''; send.disabled=true;
+      if(modo==='web'){ try{await preguntarWeb(t);} finally{send.disabled=false;input.focus();} return; }
+      if(modo==='grafo'){ try{await preguntarGrafo(t);} finally{send.disabled=false;input.focus();} return; }
+      if(modo==='itin'){ try{await preguntarItin(t);} finally{send.disabled=false;input.focus();} return; }
+      const load=cargando(); const fase=modo==='rag'?'rag':'ctx';
+      let bot=null, acum='', fin=null;
+      const quitarCarga=()=>{if(load&&load.parentNode)load.remove();};
+      try{
+        const ep=modo==='rag'?'/rag/ask/stream':'/ask/stream';
+        const r=await fetch(ep,{method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({pregunta:t,session_id:SESSION_ID})});
+        if(!r.ok||!r.body){quitarCarga();
+          const d=await r.json().catch(()=>({})); msgBot('⚠️ '+(d.detail||'Error en el servidor.')); return;}
+        const reader=r.body.getReader(); const dec=new TextDecoder(); let buf='';
+        while(true){
+          const {done,value}=await reader.read(); if(done)break;
+          buf+=dec.decode(value,{stream:true});
+          let i;
+          while((i=buf.indexOf('\n\n'))>=0){
+            const linea=buf.slice(0,i).trim(); buf=buf.slice(i+2);
+            if(!linea.startsWith('data:'))continue;
+            let data; try{data=JSON.parse(linea.slice(5).trim());}catch(_){continue;}
+            if(data.tipo==='proceso'){
+              if(!bot){quitarCarga();bot=iniciarBot(fase);}
+              agregarProceso(bot,data);
+            }else if(data.tipo==='token'){
+              if(!bot){quitarCarga();bot=iniciarBot(fase);}
+              acum+=data.texto; bot.span.textContent=acum; box.scrollTop=box.scrollHeight;
+            }else if(data.tipo==='fin'){fin=data;}
+          }
+        }
+        if(!bot){quitarCarga();bot=iniciarBot(fase);}
+        if(fin){ if(modo==='rag') agregarCitas(bot.bub,fin.citaciones); else agregarFuente(bot.bub,fin.fuente); }
+        lastReply=acum; if(ttsOn) speak(acum);
+      }catch(e){quitarCarga(); if(!bot) msgBot('⚠️ No se pudo conectar con el servidor.');}
+      finally{send.disabled=false;input.focus();}
+    }
+    function enviar(){const t=input.value.trim();if(t)preguntar(t);}
+    function quickAsk(q){input.value=q;preguntar(q);}
+    input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();enviar();}});
+
+    /* Voz: síntesis (TTS) robusta */
+    let _voces=[];
+    function _cargarVoces(){if('speechSynthesis'in window)_voces=window.speechSynthesis.getVoices()||[];}
+    if('speechSynthesis'in window){_cargarVoces();window.speechSynthesis.onvoiceschanged=_cargarVoces;}
+    function _vozEs(){return _voces.find(v=>/es[-_]/i.test(v.lang))||_voces.find(v=>/^es/i.test(v.lang))||null;}
+    function speak(t){
+      if(!('speechSynthesis'in window)){alert('Tu navegador no soporta lectura por voz.');return;}
+      // Quita etiquetas y URLs (no tiene sentido leer enlaces largos en voz alta).
+      const texto=(t||'').replace(/<[^>]*>/g,'').replace(/https?:\/\/\S+/g,' ').trim();
+      if(!texto)return;
+      window.speechSynthesis.cancel();
+      if(!_voces.length)_cargarVoces();
+      const u=new SpeechSynthesisUtterance(texto);
+      const v=_vozEs(); if(v){u.voice=v;u.lang=v.lang;} else {u.lang='es-ES';}
+      u.rate=1;u.pitch=1;
+      window.speechSynthesis.speak(u);
+      // Hack de Chrome: la síntesis se corta en textos largos; pausar+reanudar la mantiene viva.
+      clearInterval(window._ttsKeep);
+      window._ttsKeep=setInterval(()=>{
+        if(!window.speechSynthesis.speaking){clearInterval(window._ttsKeep);return;}
+        window.speechSynthesis.pause();window.speechSynthesis.resume();
+      },9000);
+    }
+    function speakLast(){if(lastReply)speak(lastReply);else speak('Aún no hay una respuesta para leer.');}
+    function toggleTTS(){ttsOn=!ttsOn;const b=document.getElementById('b-tts');b.setAttribute('aria-pressed',ttsOn);
+      if(ttsOn)speak('Lectura por voz activada. Leeré en voz alta las próximas respuestas.');
+      else{clearInterval(window._ttsKeep);window.speechSynthesis.cancel();}}
+
+    /* Voz: reconocimiento (dictado) */
+    (function(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return;
+      recog=new SR();recog.lang='es-CO';recog.continuous=false;
+      recog.onstart=()=>{listening=true;document.getElementById('voice').classList.add('show');document.getElementById('mic').classList.add('rec');};
+      recog.onresult=e=>{const t=e.results[0][0].transcript;input.value=t;preguntar(t);};
+      recog.onerror=stopV;recog.onend=stopV;})();
+    function stopV(){listening=false;document.getElementById('voice').classList.remove('show');document.getElementById('mic').classList.remove('rec');}
+    function toggleVoice(){if(!recog){alert('Tu navegador no soporta dictado por voz. Puedes escribir tu consulta.');return;}
+      if(listening){recog.stop();stopV();}else{recog.start();}}
+
+    /* Accesibilidad */
+    let scale=100;
+    function fontSize(d){scale=d===0?100:Math.min(150,Math.max(80,scale+d));
+      document.documentElement.style.setProperty('--base-scale',scale+'%');}
+    function toggleHC(){const on=document.body.classList.toggle('hc');document.getElementById('b-hc').setAttribute('aria-pressed',on);}
+    function toggleDys(){const on=document.body.classList.toggle('dys');document.getElementById('b-dys').setAttribute('aria-pressed',on);}
+
+    /* Reiniciar */
+    function clearChat(){box.innerHTML='';msgBot('Conversación reiniciada. ¿En qué te ayudo sobre Santander?');}
+
+    /* Admin: análisis de conversaciones */
+    /* Fase Itinerario (/itinerario): plan → investigar (web+guía) → redactar → revisar. */
+    async function preguntarItin(t){
+      const load=cargandoTxt('Armando tu itinerario (plan → investigar → redactar)…','<span class="badge itin">🧳 Itinerario</span>');
+      try{
+        const r=await fetch('/itinerario',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pregunta:t,session_id:SESSION_ID})});
+        load.remove();
+        if(!r.ok){const d=await r.json().catch(()=>({}));msgBot('⚠️ '+(d.detail||'Error generando el itinerario.'));return;}
+        const d=await r.json();
+        const {bub,wrap}=fila('bot');
+        const b=document.createElement('span');b.className='badge itin';
+        b.textContent='🧳 Itinerario'+(d.revisiones?(' · '+d.revisiones+' revisión(es)'):'');
+        bub.appendChild(b);bub.appendChild(document.createElement('br'));
+        renderRico(bub, d.itinerario||'No pude generar el itinerario.');
+        nombre(wrap,'Santy · Guía IA');box.scrollTop=box.scrollHeight;
+        lastReply=d.itinerario||''; if(ttsOn) speak(lastReply);
+      }catch(e){if(load&&load.parentNode)load.remove();msgBot('⚠️ No se pudo conectar con el servidor.');}
+    }
+
+    /* Fase Grafo de estados (/grafo/ask): triaje → RAG / pedir info / abrir ticket. */
+    async function preguntarGrafo(t){
+      const load=cargandoTxt('Clasificando (triaje) y respondiendo…','<span class="badge grafo">🕸️ Grafo · triaje</span>');
+      try{
+        const r=await fetch('/grafo/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pregunta:t,session_id:SESSION_ID})});
+        load.remove();
+        if(!r.ok){const d=await r.json().catch(()=>({}));msgBot('⚠️ '+(d.detail||'Error en el grafo.'));return;}
+        const d=await r.json();
+        const {bub,wrap}=fila('bot');
+        const b=document.createElement('span');b.className='badge grafo';
+        b.textContent='🕸️ Grafo · triaje'+(d.decision?(' → '+d.decision):'');
+        bub.appendChild(b);bub.appendChild(document.createElement('br'));
+        const s=document.createElement('span');s.textContent=d.respuesta||'';bub.appendChild(s);
+        if(d.citaciones&&d.citaciones.length)agregarCitas(bub,d.citaciones);
+        nombre(wrap,'Santy · Guía IA');box.scrollTop=box.scrollHeight;
+        lastReply=d.respuesta||''; if(ttsOn) speak(lastReply);
+      }catch(e){if(load&&load.parentNode)load.remove();msgBot('⚠️ No se pudo conectar con el servidor.');}
+    }
+
+    async function adminAnalisis(){
+      const clave=prompt('🔐 Clave de administrador (demo para pruebas: admin1):','admin1');if(!clave)return;
+      const load=cargando();
+      try{const r=await fetch('/admin/analisis',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clave})});
+        const d=await r.json();load.remove();
+        if(!r.ok){msgBot('⚠️ '+(d.detail||'Error en el análisis.'));return;}
+        const {bub,wrap}=fila('bot');
+        const h=document.createElement('div');h.style.fontWeight='800';h.textContent='📊 Análisis de conversaciones';bub.appendChild(h);
+        const desc=document.createElement('div');desc.style.fontSize='.78rem';desc.style.color='var(--muted)';desc.style.margin='4px 0 8px';
+        desc.textContent='Un modelo de IA (LLM) clasifica por TEMA las preguntas reales de los visitantes, guardadas en memoria y leídas con pandas. Sirve para saber qué les interesa más del turismo en Santander.';
+        bub.appendChild(desc);
+        if(!d.categorias||!d.categorias.length){
+          const p=document.createElement('div');p.textContent='Aún no hay conversaciones para analizar.';bub.appendChild(p);
+        }else{
+          const tot=d.total_preguntas||d.categorias.reduce((a,c)=>a+c.cantidad,0);
+          const top=d.categorias[0];
+          const res=document.createElement('div');res.style.marginBottom='6px';
+          res.textContent='Sobre '+tot+' pregunta(s), el tema más consultado es «'+top.categoria+'».';bub.appendChild(res);
+          d.categorias.forEach(c=>{const pct=Math.round(100*c.cantidad/tot);
+            const row=document.createElement('div');row.style.margin='2px 0';
+            row.textContent='• '+c.categoria+': '+c.cantidad+' ('+pct+'%)';bub.appendChild(row);});
+        }
+        nombre(wrap,'Santy · Guía IA');box.scrollTop=box.scrollHeight;
+      }catch(e){load.remove();msgBot('⚠️ No se pudo conectar con el servidor.');}}
+
+    /* Visión: identificar por foto */
+    document.getElementById('img').addEventListener('change',async function(){
+      const f=this.files[0];if(!f)return;msgUser('📷 Envié una imagen para identificar…');
+      const load=cargando();const fd=new FormData();fd.append('file',f);fd.append('pregunta','');
+      try{const r=await fetch('/vision',{method:'POST',body:fd});const d=await r.json();load.remove();
+        if(!r.ok){msgBot('⚠️ '+(d.detail||'Error al analizar la imagen.'));return;}
+        let t='';if(d.titulo)t+='🖼️ '+d.titulo;if(d.tipo&&d.tipo!=='otro')t+=' ('+d.tipo+')';if(d.titulo)t+='\n\n';
+        t+=d.descripcion||'';
+        if(d.relacion_santander&&d.relacion_santander.toLowerCase()!=='ninguna')t+='\n\n📍 Santander: '+d.relacion_santander;
+        if(d.etiquetas&&d.etiquetas.length)t+='\n🏷️ '+d.etiquetas.join(' · ');
+        msgBot(t);lastReply=t;if(ttsOn)speak(t);}
+      catch(e){load.remove();msgBot('⚠️ No se pudo conectar con el servidor.');}
+      this.value='';});
+  </script>
+</body>
+</html>
